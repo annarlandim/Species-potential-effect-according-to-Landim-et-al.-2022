@@ -9,59 +9,22 @@ library(gridExtra)
 
 #################################################################################################
 
-### THEORETICAL EXAMPLES (Figures 1, 2 and 3)
-
-# Function to estimate the potential effect for different values of theta
-
-spi <- function(G1_corrigido, Ff, Fp, volume, comprimento){
-  
-  Ft <- vector()
-  
-  for(i in 1:comprimento){
-    
-    Ft[i] <- (sum(((G1_corrigido/Ff)^i) * Fp) * volume)^(1/i)
-    
-    
-  }
-  
-  Ft
-}
-
-# Function to estimate the potential effect for different values of theta when
-# info on the quantitative contribution is available
-
-spi_a <- function(G1_corrigido, Ff, Fp, volume, comprimento){
-  
-  Ff.2 <- Ff[-(which(Ff == 0))] 
-  G1_corrigido.2 <- G1_corrigido[-(which(Ff == 0))]
-  Fp_corrigido.2 <- Fp[-(which(Ff == 0))]
-  
-  Ft <- vector()
-  
-  for(i in 1:comprimento){
-    
-    Ft[i] <- (sum(((G1_corrigido.2 /Ff.2)^i) * Fp_corrigido.2) * volume)^(1/i)
-    
-    
-  }
-  
-  Ft
-}
-
-##########################################################################################
+### THEORETICAL EXAMPLES (Figure 1 from the main text and Figures 1 and 2 from the Supplementary Material )
 
 # Conceptual model (Figure 1)
 
+#1A
+
 # Creating the trait values for species i, consumers community and resource community
-traits.sic <- seq(from = 20, to = 90, by = 0.1) 
-traits.cc <- seq(from = 0.1, to = 100, by = 0.1)
+traits.sic <- seq(from = 60, to = 120, by = 0.1) 
+traits.cc <- seq(from = 0.1, to = 80, by = 0.1)
 traits.cr <- seq(from = 0.1, to = 120, by = 0.1)
 
 # Creating the trait probability densities for species i, consumers community and resource community
-y.sic <- dgamma(traits.sic, shape = 22, scale = 2.3) 
-y.cc <- dgamma(traits.cc, shape = 2.5, scale = 11)
-y.cr <- dgamma(traits.cr, shape = 2.5, scale = 12)
-y.cr <- y.cr * 2
+y.sic <- dgamma(traits.sic, shape = 50, scale = 1.8) 
+y.cc <- dgamma(traits.cc, shape = 4, scale = 6)
+y.cr <- dgamma(traits.cr, shape = 2.5, scale = 15)
+y.cr <- y.cr * 2.5
 
 # Organizing into data frames
 ex2.sic <- as.data.frame(cbind(traits.sic, y.sic))
@@ -80,28 +43,187 @@ ex.2 <- rbind(ex2.sic, ex2.cc, ex2.cr)
 ex.2$Order <- c(rep(3, times = nrow(ex2.sic)), rep(2, times = nrow(ex2.cc)), rep(1, times = nrow(ex2.cr)))
 ex.2$Group <- reorder(ex.2$Group, ex.2$Order)
 
-sic.p_ra.ex2 <- ex.2[ex.2$Group == "Interactions performed by consumer species", 2] * 0.1
-cc.p_ra <- (ex.2[ex.2$Group == "Interactions performed by consumer community", 2] * 0.9) 
-cc.p_ra.ex2 <- c((cc.p_ra[c(1:199)]), ((cc.p_ra[c(200:900)]) + (sic.p_ra.ex2*0.1)), (cc.p_ra[c(901:1000)]))
+sic.p_ra.ex2 <- ex.2[ex.2$Group == "Interactions performed by consumer species", 2] * .1
+cc.p_ra <- (ex.2[ex.2$Group == "Interactions performed by consumer community", 2] ) 
+cc.p_ra.ex2 <- c((cc.p_ra[c(1:599)]), ((cc.p_ra[c(600:800)]) + (sic.p_ra.ex2[c(1:201)]*0.1)))
 cr.p_ra.ex2 <- ex.2[ex.2$Group == "Interactions available within the resource community", 2]
 
-ex.2$Probability_ra <- c(sic.p_ra.ex2, cc.p_ra.ex2, cr.p_ra.ex2) 
+ex.2$Probability_ra <- c(sic.p_ra.ex2, cc.p_ra.ex2, cr.p_ra.ex2)  
 
-# Plotting
-
+#Plotting
 ggplot(ex.2, aes(x = Traits, fill = Group)) +
-  geom_ribbon(aes(ymin = 0, ymax = Probability_ra), alpha = 0.5) +
+  geom_ribbon(aes(ymin = 0, ymax = Probability_ra), alpha = .8) +
   xlab("Trait 1") +
+  ylab("Probability Density") +
   ylim(c(0, 0.08)) +
-  scale_fill_manual(values = c("#00BA38", "#FF67A4", "#F8766D"), name = "",
+  scale_fill_manual(values = c("#00BA38", "#FF67A4", "purple"), name = "",
                     labels = c("Interactions available within the resource community", "Interactions performed by the consumers community",
                                expression(paste("Interactions performed by ",italic("Species")[paste(italic("i"))])))) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
         panel.background = element_blank(), axis.line = element_line(colour = "black"),
-        axis.line.y = element_blank(), axis.text.y = element_blank(), axis.text.x = element_blank(),  
-        axis.ticks = element_blank(), axis.title.y = element_blank(), legend.key = element_rect(colour = NA, fill = NA))
+        axis.text.y = element_blank(), axis.text.x = element_blank(),  
+        axis.ticks = element_blank(), legend.key = element_rect(colour = NA, fill = NA),
+        axis.text=element_text(size=14), axis.title=element_text(size=16), legend.text = element_text(size = 16),
+        legend.position = "none")
 
-###### Examples (Figures 2 and 3)
+#1B
+
+# Creating the trait values for species i, consumers community and resource community
+traits.sic <- seq(from = 90, to = 150, by = 0.1) 
+traits.cc <- seq(from = 0.1, to = 80, by = 0.1)
+traits.cr <- seq(from = 0.1, to = 90, by = 0.1)
+
+# Creating the trait probability densities for species i, consumers community and resource community
+y.sic <- dgamma(traits.sic, shape = 65, scale = 1.8) 
+y.cc <- dgamma(traits.cc, shape = 4, scale = 6)
+y.cr <- dgamma(traits.cr, shape = 2.5, scale = 10)
+y.cr <- y.cr * 1.8
+
+# Organising into data frames
+ex2.sic <- as.data.frame(cbind(traits.sic, y.sic))
+ex2.sic$Group <- rep("Interactions performed by consumer species", times = nrow(ex2.sic))
+colnames(ex2.sic)[1] <- "Traits"
+colnames(ex2.sic)[2] <- "Probability"
+ex2.cc <- as.data.frame(cbind(traits.cc, y.cc))
+ex2.cc$Group <- rep("Interactions performed by consumer community", times = nrow(ex2.cc))
+colnames(ex2.cc)[1] <- "Traits"
+colnames(ex2.cc)[2] <- "Probability"
+ex2.cr <- as.data.frame(cbind(traits.cr, y.cr))
+ex2.cr$Group <- rep("Interactions available within the resource community", times = nrow(ex2.cr))
+colnames(ex2.cr)[1] <- "Traits"
+colnames(ex2.cr)[2] <- "Probability"
+ex.2 <- rbind(ex2.sic, ex2.cc, ex2.cr)
+ex.2$Order <- c(rep(3, times = nrow(ex2.sic)), rep(2, times = nrow(ex2.cc)), rep(1, times = nrow(ex2.cr)))
+ex.2$Group <- reorder(ex.2$Group, ex.2$Order)
+
+sic.p_ra.ex2 <- ex.2[ex.2$Group == "Interactions performed by consumer species", 2] * .15
+cc.p_ra <- (ex.2[ex.2$Group == "Interactions performed by consumer community", 2] ) 
+cr.p_ra.ex2 <- ex.2[ex.2$Group == "Interactions available within the resource community", 2]
+
+ex.2$Probability_ra <- c(sic.p_ra.ex2, cc.p_ra.ex2, cr.p_ra.ex2)  
+
+# Plotting
+#png("1B.png", units="in", width=10, height=10, res=300)  
+ggplot(ex.2, aes(x = Traits, fill = Group)) +
+  geom_ribbon(aes(ymin = 0, ymax = Probability_ra), alpha = .8) +
+  xlab("Trait 1") +
+  ylab("Probability Density") +
+  ylim(c(0, 0.08)) +
+  scale_fill_manual(values = c("#00BA38", "#FF67A4", "purple"), name = "",
+                    labels = c("Interactions available within the resource community", "Interactions performed by the consumers community",
+                               expression(paste("Interactions performed by ",italic("Species")[paste(italic("i"))])))) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        panel.background = element_blank(), axis.line = element_line(colour = "black"),
+        axis.text.y = element_blank(), axis.text.x = element_blank(),  
+        axis.ticks = element_blank(), legend.key = element_rect(colour = NA, fill = NA),
+        axis.text=element_text(size=14), axis.title=element_text(size=16), legend.text = element_text(size = 16),
+        legend.position = "none")
+#dev.off()
+
+#1C
+
+# Creating the trait values for species i, consumers community and resource community
+traits.sic <- seq(from = 10, to = 70, by = 0.1) 
+traits.cc <- seq(from = 0.1, to = 80, by = 0.1)
+traits.cr <- seq(from = 0.1, to = 120, by = 0.1)
+
+# Creating the trait probability densities for species i, consumers community and resource community
+y.sic <- dgamma(traits.sic, shape = 25, scale = 1.8) 
+y.cc <- dgamma(traits.cc, shape = 4, scale = 6)
+y.cr <- dgamma(traits.cr, shape = 2.5, scale = 15)
+y.cr <- y.cr * 2.5
+
+# Organising into data frames
+ex2.sic <- as.data.frame(cbind(traits.sic, y.sic))
+ex2.sic$Group <- rep("Interactions performed by consumer species", times = nrow(ex2.sic))
+colnames(ex2.sic)[1] <- "Traits"
+colnames(ex2.sic)[2] <- "Probability"
+ex2.cc <- as.data.frame(cbind(traits.cc, y.cc))
+ex2.cc$Group <- rep("Interactions performed by consumer community", times = nrow(ex2.cc))
+colnames(ex2.cc)[1] <- "Traits"
+colnames(ex2.cc)[2] <- "Probability"
+ex2.cr <- as.data.frame(cbind(traits.cr, y.cr))
+ex2.cr$Group <- rep("Interactions available within the resource community", times = nrow(ex2.cr))
+colnames(ex2.cr)[1] <- "Traits"
+colnames(ex2.cr)[2] <- "Probability"
+ex.2 <- rbind(ex2.sic, ex2.cr)
+ex.2$Order <- c(rep(2, times = nrow(ex2.sic)), rep(1, times = nrow(ex2.cr)))
+ex.2$Group <- reorder(ex.2$Group, ex.2$Order)
+
+sic.p_ra.ex2 <- ex.2[ex.2$Group == "Interactions performed by consumer species", 2] * .1
+cr.p_ra.ex2 <- ex.2[ex.2$Group == "Interactions available within the resource community", 2]
+
+ex.2$Probability_ra <- c(sic.p_ra.ex2, cr.p_ra.ex2)  
+
+#Plotting
+#png("1C.png", units="in", width=10, height=10, res=300)  
+ggplot(ex.2, aes(x = Traits, fill = Group)) +
+  geom_ribbon(aes(ymin = 0, ymax = Probability_ra), alpha = .8) +
+  xlab("Trait 1") +
+  ylab("Probability Density") +
+  ylim(c(0, 0.08)) +
+  scale_fill_manual(values = c("#00BA38", "purple"), name = "") +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        panel.background = element_blank(), axis.line = element_line(colour = "black"),
+        axis.text.y = element_blank(), axis.text.x = element_blank(),  
+        axis.ticks = element_blank(), legend.key = element_rect(colour = NA, fill = NA),
+        axis.text=element_text(size=14), axis.title=element_text(size=16), legend.text = element_text(size = 16),
+        legend.position = "none")
+#dev.off()
+
+#1D
+
+# Creating the trait values for species i, consumers community and resource community
+traits.sic <- seq(from = 60, to = 120, by = 0.1) 
+traits.cc <- seq(from = 0.1, to = 80, by = 0.1)
+traits.cr <- seq(from = 0.1, to = 120, by = 0.1)
+
+# Creating the trait probability densities for species i, consumers community and resource community
+y.sic <- dgamma(traits.sic, shape = 50, scale = 1.8) 
+y.cc <- dgamma(traits.cc, shape = 4, scale = 6)
+y.cr <- dgamma(traits.cr, shape = 2.5, scale = 15)
+y.cr <- y.cr * 2.5
+
+# Organising into data frames
+ex2.sic <- as.data.frame(cbind(traits.sic, y.sic))
+ex2.sic$Group <- rep("Interactions performed by consumer species", times = nrow(ex2.sic))
+colnames(ex2.sic)[1] <- "Traits"
+colnames(ex2.sic)[2] <- "Probability"
+ex2.cc <- as.data.frame(cbind(traits.cc, y.cc))
+ex2.cc$Group <- rep("Interactions performed by consumer community", times = nrow(ex2.cc))
+colnames(ex2.cc)[1] <- "Traits"
+colnames(ex2.cc)[2] <- "Probability"
+ex2.cr <- as.data.frame(cbind(traits.cr, y.cr))
+ex2.cr$Group <- rep("Interactions available within the resource community", times = nrow(ex2.cr))
+colnames(ex2.cr)[1] <- "Traits"
+colnames(ex2.cr)[2] <- "Probability"
+ex.2 <- rbind(ex2.sic, ex2.cr)
+ex.2$Order <- c(rep(2, times = nrow(ex2.sic)), rep(1, times = nrow(ex2.cr)))
+ex.2$Group <- reorder(ex.2$Group, ex.2$Order)
+
+sic.p_ra.ex2 <- ex.2[ex.2$Group == "Interactions performed by consumer species", 2] * .1
+cr.p_ra.ex2 <- ex.2[ex.2$Group == "Interactions available within the resource community", 2]
+
+ex.2$Probability_ra <- c(sic.p_ra.ex2, cr.p_ra.ex2)  
+
+#Plotting
+#png("1D.png", units="in", width=10, height=10, res=300)  
+ggplot(ex.2, aes(x = Traits, fill = Group)) +
+  geom_ribbon(aes(ymin = 0, ymax = Probability_ra), alpha = .8) +
+  xlab("Trait 1") +
+  ylab("Probability Density") +
+  ylim(c(0, 0.08)) +
+  scale_fill_manual(values = c("#00BA38", "purple"), name = "") +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        panel.background = element_blank(), axis.line = element_line(colour = "black"),
+        axis.text.y = element_blank(), axis.text.x = element_blank(),  
+        axis.ticks = element_blank(), legend.key = element_rect(colour = NA, fill = NA),
+        axis.text=element_text(size=14), axis.title=element_text(size=16), legend.text = element_text(size = 16),
+        legend.position = "none")
+#dev.off()
+
+
+###### Examples (Figures 1 and 2 from the Supplementary Material)
 
 # Available data: species presence and abundance
 # There are N other species in the Consumers Community (Cc), besides species 1-4
@@ -462,136 +584,4 @@ s4c.p_ra[s4c.p_ra>0] <- 1
 s4c.nw <- (sum(s4c.p_ra) * (max(traits.cr)/length(y.cr))) / (sum(y.cr) * (max(traits.cr)/length(y.cr))) 
 
 ############################################################################################################
-
-# Using real data with the 'ks' package
-# For more details on the 'ks' package: https://cran.r-project.org/web/packages/ks/ks.pdf
-
-# Creating the resource community functional space:
-
-Hpi.Cr <- Hpi(x = dataframewithCrtraits)
-Cr_kde <- kde(x = dataframewithCrtraits, H = Hpi.Cr, gridsize = c(n1, n2, n3), xmin = c(0,0,0), xmax = c(maxvalueoftrait1, maxvalueoftrait2, maxvalueoftrait3), binned = FALSE)
-
-# Correcting for integral = 1
-Cr_corr <- Cr_kde$estimate / (sum(Cr_kde$estimate) * (max(dataframewithCrtraits[,1])/length(Cr_kde$eval.points[[1]]) * max(dataframewithCrtraits[,2])/length(Cr_kde$eval.points[[2]]) * max(dataframewithCrtraits[,3])/length(Cr_kde$eval.points[[3]])))
-
-# n1, n2 and n3 are the number of times the trait probability density will be split to estimate the integral.
-
-## Function to obtain:
-
-### Kernel density estimation: Focal species' kde [[1]]
-### Sp_corr: TPDs estimation  corrected to integral = 1 [[2]]
-### Volume: The volume to calculate the integral [[3]]
-
-### ATENTION: In this function, the functional trait space is composed by three traits.
-### If you want to add or remove traits you will have to do it manually. For two traits
-### you need to remove n3 from the function, as well as other things related to it,
-### for example, in gridsize, remove n3, in xmin remove one 0, in xmax remove max(Cr[,3])
-### and so on. 
-
-### I use the coordinates of the resource's community functional space for the volume 
-### because it dictates which will be the maximum values of each trait, whereas in a 
-### defaunated community the functional space of the consumers community might not have
-### the maximum values of some or all traits.
-
-Kdes <- function(Sp, Cr, n1, n2, n3){
-  
-  # Sp should be a data frame with the traits in the columns and trait values of the focal species along the lines
-  # Cr should be a data frame with the traits in the columns and trait values of the resource community along the lines
-  # n1, n2 and n3 are the number of times the trait probability density will be split to estimate the integral.
-  # they have to be they must be chosen so that the integral is as close as possible to 1 
-  
-  # Building the focal species' TPDs
-  
-  Hpi.Sp <- Hpi(x = Sp)
-  kde.Sp <- kde(x = Sp, H = Hpi.Sp, gridsize = c(n1,n2,n3), xmin = c(0,0,0), xmax = c(max(Cr[,1]), max(Cr[,2]), max(Cr[,3])), binned = FALSE)
-  
-  # The integral 
-  int_Sp <- sum(kde.G1$estimate) * ((max(Cr[,1])/n1)
-                                    * (max(Cr[,2])/n2)
-                                    * (max(Cr[,3])/n3))
-  
-  # Correcting for integral = 1 
-  
-  Sp_corr <- kde.Sp$estimate / int_Sp
-  
-  
-  volume <- ((max(Cr[,1])/n1) * (max(Cr[,2])/n2) * (max(Cr[,3])/n3))
-  
-  
-  list(kde.Sp, Sp_corr, volume)
-  
-}
-
-# Consumers community functional space:
-
-Cc <- (Sp1_corr * relative quantitative contribution) + (Sp2_corr * relative quantitative contribution) +...+(Spn_corr * relative quantitative contribution)
-
-# Function to estimate the species potential effect for different values of theta
-
-# With the quantitative contribution
-
-pe.qt <- function(Vic, Vc, Sp_corr, Cc, Cr_corr, volume, thetamax){
-  
-  # Vic is the quantitative contribution of the focal species i
-  # Vc is the total quantitative contribution of the consumers community
-  # thetamax is the maximum value of theta that you want to use to estimate the potential effect
-  
-  Cc.2 <- Cc[-(which(Cc == 0))] 
-  Sp_corr.2 <- Sp_corr[-(which(Cc == 0))]
-  Cr_corr.2 <- Cr_corr[-(which(Cc == 0))]
-  
-  Pe <- vector()
-  
-  for(i in 1:thetamax){
-    
-    Pe[i] <- (sum(((Sp_corr.2 * (Qt_Sp/Qt_Cc)/Cc.2)^i) * Cr_corr.2) * volume)^(1/i)
-    
-    
-  }
-  
-  Pe
-}
-
-# Without the quantitative contribution
-
-pe <- function(Sp_corr, Cc, Cr_corr, volume, thetamax){
-  
-  # thetamax is the maximum value of theta that you want to use to estimate the potential effect
-  
-  Cc.2 <- Cc[-(which(Cc == 0))] 
-  Sp_corr.2 <- Sp_corr[-(which(Cc == 0))]
-  Cr_corr.2 <- Cr_corr[-(which(Cc == 0))]
-  
-  Pe <- vector()
-  
-  for(i in 1:comprimento){
-    
-    Pe[i] <- (sum(((Sp_corr.2 /Cc.2)^i) * Cr_corr.2) * volume)^(1/i)
-    
-    
-  }
-  
-  Pe
-}
-
-Pe_sp1 <- pe((Sp1_corr), Cc, Cr_corr, (max(dataframewithCrtraits[,1])/length(Cr_kde$eval.points[[1]]) * max(dataframewithCrtraits[,2])/length(Cr_kde$eval.points[[2]]) * max(dataframewithCrtraits[,3])/length(Cr_kde$eval.points[[3]])), 20)
-Pe_sp2 <- pe((Sp2_corr), Cc, Cr_corr, (max(dataframewithCrtraits[,1])/length(Cr_kde$eval.points[[1]]) * max(dataframewithCrtraits[,2])/length(Cr_kde$eval.points[[2]]) * max(dataframewithCrtraits[,3])/length(Cr_kde$eval.points[[3]])), 20)
-Pe_spn <- pe((Spn_corr), Cc, Cr_corr, (max(dataframewithCrtraits[,1])/length(Cr_kde$eval.points[[1]]) * max(dataframewithCrtraits[,2])/length(Cr_kde$eval.points[[2]]) * max(dataframewithCrtraits[,3])/length(Cr_kde$eval.points[[3]])), 20)
-
-Pe_Cc <- as.data.frame(c(Pe_sp1, Pe_sp2, Pe_spn))
-Pe_Cc$Species <- c(rep("Sp1", times = 20), rep("Sp2", times = 20), rep("Spn", times = 20))
-Pe_Cc$Theta <- rep(c(1:20), times = n)
-str(Pe_Cc)
-colnames(Pe_Cc)[1] <- "Potential effect"
-Pe_Cc$Species <- as.factor(Pe_Cc$Species)
-Pe_Cc$Theta <- as.numeric(Pe_Cc$Theta)
-
-ggplot(Pe_Cc, aes(x = Theta, y = `Potential effect`), fill = Species) +
-  geom_line(aes(color = Species), size=1) +
-  xlab("θ") +
-  ylab("Potential effect") +
-  scale_x_continuous(limits = c(1, 20), breaks = c(1, 5, 10, 15, 20)) +
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-        panel.background = element_blank(), axis.line = element_line(colour = "black"),
-        axis.text.y = element_blank(), axis.ticks.y = element_blank(), legend.key = element_rect(colour = NA, fill = NA))
 
