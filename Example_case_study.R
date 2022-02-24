@@ -153,7 +153,7 @@ pnt.plnts <- plnts[, c(4,5,7)]
 
 # Animals
 
-nicho.reintro <- read.csv("NichoPNT reintro.csv")
+nicho.reintro <- read.csv("ConsumersPNT.csv")
 nicho.reintro.na <- nicho.reintro[,c(2,3,5,6,8)]
 nicho.reintro <- na.omit(nicho.reintro.na)
 
